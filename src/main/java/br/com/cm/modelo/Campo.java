@@ -7,12 +7,12 @@ import java.util.List;
 
 public class Campo {
 
-    private boolean minado = false;
+    private final boolean minado = false;
     private boolean aberto = false;
     private boolean marcado = false;
-    private int bombaEmArea = 0;
+    private final int bombaEmArea = 0;
 
-    private List<Campo> vizinhos = new ArrayList<Campo>();
+    private final List<Campo> vizinhos = new ArrayList<>();
 
     private final int linha;
     private final int coluna;
@@ -58,7 +58,7 @@ public class Campo {
             }
 
             if(vizinhancaSegura()) {
-                vizinhos.forEach(vizinho -> vizinho.abrir());
+                vizinhos.forEach(Campo::abrir);
             }
             return true;
         } else {
