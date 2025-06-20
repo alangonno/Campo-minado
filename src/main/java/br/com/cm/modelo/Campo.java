@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Campo {
 
-    private final boolean minado = false;
+    private boolean minado = false;
     private boolean aberto = false;
     private boolean marcado = false;
     private final int bombaEmArea = 0;
@@ -28,7 +28,7 @@ public class Campo {
         boolean linhaDiferente = linha != vizinho.linha;
         boolean colunaDiferente = coluna != vizinho.coluna;
         boolean diagonal = linhaDiferente && colunaDiferente;
-        int delta = Math.abs(linha+coluna) - (vizinho.coluna +vizinho.linha);
+        int delta = Math.abs((linha+coluna) - (vizinho.coluna + vizinho.linha));
 
         if (!diagonal && delta == 1) {
             vizinhos.add(vizinho);
@@ -49,7 +49,7 @@ public class Campo {
         }
     }
 
-    boolean abrir() {
+    public boolean abrir() {
         if (!marcado && !aberto) {
             aberto = true;
 
@@ -70,5 +70,64 @@ public class Campo {
         return vizinhos.stream().noneMatch(campoVizinho -> campoVizinho.minado);
     }
 
+    public void minar() {
+        minado = true;
+    }
 
+    public boolean isMarcado() {
+        return marcado;
+    }
+    public boolean isAberto() {
+        return aberto;
+    }
+
+    public boolean isMinado() {
+        return minado;
+    }
+
+    public int getBombaEmArea() {
+        return bombaEmArea;
+    }
+
+    public List<Campo> getVizinhos() {
+        return vizinhos;
+    }
+
+    public int getLinha() {
+        return linha;
+    }
+
+    public int getColuna() {
+        return coluna;
+    }
+
+    boolean objetivoAlcancado() {
+        boolean desvendado = !minado && aberto;
+        boolean protegido = minado && marcado;
+        return  desvendado || protegido;
+    }
+
+    long minasNaVizinhanca() {
+        return vizinhos.stream().filter(v -> v.isMinado()).count();
+    }
+
+    void reiniciar() {
+        aberto = false;
+        minado = false;
+        marcado = false;
+    }
+
+    public String toString() {
+        if(marcado) {
+            return"x";
+        } else if(aberto && minado) {
+            return "*";
+        } else if (aberto && minasNaVizinhanca() > 0) {
+            return Long.toString(minasNaVizinhanca());
+        } else if (aberto) {
+            return " ";
+        } else {
+            return "?";
+        }
+    }
 }
