@@ -1,5 +1,7 @@
 package br.com.cm.modelo;
 
+import br.com.cm.excecao.ExplosaoException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -20,6 +22,30 @@ public class Tabuleiro {
         gerarCampos();
         associarOsVizinhos();
         sortearMinas();
+    }
+
+    public void abrir(int coluna, int linha) {
+        try {
+            campos.parallelStream()
+                    .filter(c -> c.getLinha() == linha &&
+                            c.getColuna() == coluna)
+                    .findFirst()
+                    .ifPresent(c -> c.abrir());
+        } catch (ExplosaoException e) {
+            campos.parallelStream()
+                    .forEach(campo -> campo.setAberto(true));
+
+            throw e;
+        }
+
+    }
+
+    public void alternarMarcarcao(int coluna, int linha) {
+        campos.parallelStream()
+                .filter(c -> c.getLinha() == linha &&
+                        c.getColuna() == coluna)
+                .findFirst()
+                .ifPresent(c -> c.alternarMarcacao());
     }
 
     private void gerarCampos() {
@@ -43,9 +69,9 @@ public class Tabuleiro {
         long minasArmadas = 0;
         Predicate<Campo> minado = campo -> campo.isMinado();
         do {
-            minasArmadas = campos.stream().filter(minado).count();
             int aleatorio = (int) (Math.random() * campos.size());
             campos.get(aleatorio).minar();
+            minasArmadas = campos.stream().filter(minado).count();
 
         } while (minasArmadas < minas);
     }
@@ -60,6 +86,27 @@ public class Tabuleiro {
     }
 
     public String toString() {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
 
+        sb.append(" ");
+        for (int l = 0; l < colunas; l++) {
+            sb.append(" ");
+            sb.append(l);
+            sb.append(" ");
+        }
+        sb.append("\n");
+
+        for (int linha = 0; linha < linhas; linha++) {
+            sb.append(linha);
+            for (int coluna = 0; coluna < colunas; coluna++) {
+                sb.append(" ");
+                sb.append(campos.get(i));
+                sb.append(" ");
+                i++;
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
